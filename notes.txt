@@ -1,0 +1,94 @@
+# feed2text: a simple little toy app
+
+- look at feed2text.py
+- requirements.txt uses click, feedparser, html2text
+- quick demo:
+
+    $ python feed2text.py
+    [help text]
+    
+    $ python feed2text.py fetch
+    Usage: feed2text.py fetch [OPTIONS] URL
+    
+    Error: Missing argument "url".
+    
+    $ python feed2text.py fetch http://feeds.feedburner.com/PythonInsider
+
+The take-home:
+
+    a. We write little scripts like this all the time
+    b. Installing great third-party packages makes it easy and fast to do so
+    c. But...
+
+
+Now how do you share it?
+
+    a. Clone repo, setup virtualenv, pip install requirements...
+
+    b. Build a proper package with a setup.py, put on pypi? etc.
+
+    c. Still stuck with "What's pip?", "What's virtualenv?"
+
+    d. All fine for Python developers. If your audience is just Python developers. But why should a user of this need to learn all about Python packaging, warts and all, just to run a simple script?
+
+
+# Enter [pex](https://pex.readthedocs.org/en/latest/index.html):
+
+First, I'm going to show how to use pex, *then* explain how it works
+
+    $ deactivate  # leave virtualenv
+    $ pip freeze | grep requests
+    $ pex -r requests
+    >>> import requests
+    >>> requests.get('http://pythonkc.com')
+
+Or, more usefully, run our script:
+
+    $ pex -r click -r feedparser -r html2text ./feed2text.py
+    Usage: feed2text.py [OPTIONS] COMMAND [ARGS]...
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      fetch
+
+    $ pex -r click -r feedparser -r html2text ./feed2text.py fetch http://feeds.feedburner.com/PythonInsider
+
+Next step: save our environment to a file. A custom 'python environment/interpreter in a box'!
+
+    $ pex -r click -r feedparser -r html2text -o feed2text.pex
+    $ ./feed2text.pex feed2text.py
+
+That's kind of cool, but we want a single file. Unfortunately, python packaging
+bites us here. We need a proper python package with a setup.py for this, so we
+need to do some moving around:
+
+So:
+
+    $ git checkout step2
+
+Basically this did:
+
+    $ mkdir feed2text
+    $ mv feed2text.py feed2text/__init__.py
+    $ vi setup.py
+
+
+Now, to build a single pex file:
+
+      $ python setup.py bdist_wheel
+      $ pex -s `pwd` -e feed2text:cli -o dist/feed2text.pex 
+
+And now we can just run our pex file directly:
+
+      $ ./dist/feed2text.pex
+      $ ./dist/feed2text.pex fetch http://feeds.feedburner.com/PythonInsider
+
+
+So how does this work? It's just a zip file.
+
+    $ cd dist
+    $ unzip feed2text.pex  
+    $ ls -a
+    $ head -n 1 feed2text.pex

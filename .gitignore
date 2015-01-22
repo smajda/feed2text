@@ -1,4 +1,7 @@
 feeds
+build
+dist
 .DS_Store
 *.pex
 *.pyc
+*.egg-info
