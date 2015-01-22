@@ -1,0 +1,4 @@
+feeds
+.DS_Store
+*.pex
+*.pyc
