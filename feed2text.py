@@ -19,7 +19,7 @@ def fetch(url):
     # We're going to save into a directory named after the feed
     # in our current directory in a 'feeds' directory
     feed_name = response.feed.title
-    feed_directory = "%s/%s" % (os.path.abspath(os.curdir), 'feeds', feed_name)
+    feed_directory = "%s/%s/%s" % (os.path.abspath(os.curdir), 'feeds', feed_name)
     if not os.path.exists(feed_directory):
         os.makedirs(feed_directory)
 
